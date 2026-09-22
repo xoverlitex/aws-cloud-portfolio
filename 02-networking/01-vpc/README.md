@@ -1,19 +1,14 @@
-# VPC Networking Lab
+# Multi-AZ VPC Networking Lab
 
 ## Objective
 
 Build and validate a two-AZ AWS network that keeps workloads private, provides controlled administrative access, and permits temporary outbound internet access for testing.
 
-## Design
+## Architecture
 
-| Component | Implementation |
-| --- | --- |
-| VPC | Private RFC 1918 address space split across two Availability Zones |
-| Public tier | Two public subnets; a bastion host provides the administrative entry point |
-| Private tier | Two application subnets; instances do not receive public IP addresses |
-| Egress | NAT Gateways were used for validation, then deleted to avoid charges |
-| Access control | Stateful Security Groups restrict SSH to the bastion-to-application path |
-| Visibility | CloudTrail records API activity; VPC Flow Logs support network investigation |
+![AWS resource map](screenshots/architecture-overview.png)
+
+The environment separates public and private subnet tiers across two Availability Zones. Application instances do not receive public IP addresses.
 
 ```text
 Administrator
@@ -27,6 +22,17 @@ Private application instances
     ▼
 NAT Gateway → Internet Gateway → Internet
 ```
+
+## Implementation
+
+| Component | Implementation |
+| --- | --- |
+| VPC | Private RFC 1918 address space split across two Availability Zones |
+| Public tier | Two public subnets; a bastion host provides the administrative entry point |
+| Private tier | Two application subnets; instances do not receive public IP addresses |
+| Egress | NAT Gateways were used for validation, then deleted to avoid charges |
+| Access control | Stateful Security Groups restrict SSH to the bastion-to-application path |
+| Visibility | CloudTrail records API activity; VPC Flow Logs support network investigation |
 
 ## Validation
 
@@ -45,17 +51,22 @@ NAT Gateway → Internet Gateway → Internet
 - IAM learning material follows least-privilege principles and distinguishes trust policies from permission policies.
 - An `ACCEPT` VPC Flow Log record indicates network-layer acceptance; it does not prove that an application accepted a connection or that a host was compromised.
 
+## Screenshots
+
+| Evidence | Description |
+| --- | --- |
+| [Architecture overview](screenshots/architecture-overview.png) | VPC resources and their relationships |
+| [Bastion Security Group](screenshots/bastion-security-group.png) | Controlled SSH entry point |
+| [Private subnet](screenshots/private-subnet.png) | Private application placement |
+| [Private application instance](screenshots/private-application-instance.png) | Workload running without a public address |
+| [Flow Logs destination](screenshots/flow-logs-s3-destination.png) | Logging configuration evidence |
+
 ## Cost management
 
-NAT Gateways were deleted after testing because they incur hourly and data-processing charges. EC2 instances were stopped after validation. Check for unused Elastic IPs or other temporary resources before considering a lab complete.
-
-## Evidence
-
-Screenshots are intentionally not embedded until they have been reviewed for account IDs, resource IDs, public IP addresses, bucket names, and credentials. See the repository [evidence guide](../../docs/evidence.md) before adding them.
+NAT Gateways were deleted after testing because they incur hourly and data-processing charges. EC2 instances were stopped after validation.
 
 ## Next steps
 
 1. Add a practical EC2 IAM-role exercise with least-privilege policy and validation.
 2. Rebuild the network with Terraform.
 3. Add CloudWatch alarms, GuardDuty, AWS Config, and Security Hub.
-4. Add sanitized architecture and validation screenshots.
