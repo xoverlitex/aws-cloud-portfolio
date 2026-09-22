@@ -1,23 +1,15 @@
 # AWS Cloud & Security Portfolio
 
-A practical AWS networking and cloud-security lab demonstrating how to design, secure, validate, and document a small multi-AZ environment.
+A practical AWS networking and cloud-security portfolio built from hands-on AWS labs. This repository documents the design decisions, validation work, and security controls behind a multi-AZ VPC environment.
 
-## Project at a glance
+## Featured project: multi-AZ VPC
 
-| Area | What this lab demonstrates |
-| --- | --- |
-| Networking | Custom VPC, public and private subnets, route tables, Internet Gateway, and NAT egress |
-| Compute access | Bastion-mediated SSH to private EC2 instances |
-| Security | Security Groups, IAM fundamentals, least privilege, CloudTrail, and VPC Flow Logs |
-| Operations | Connectivity testing, traffic interpretation, and cost-aware teardown |
-
-## Architecture
+A private application environment spanning two Availability Zones, built with public and private subnet tiers, a bastion host for administration, NAT egress during validation, and AWS-native logging.
 
 ```mermaid
 flowchart TB
   Internet((Internet)) --> IGW[Internet Gateway]
   subgraph VPC[Custom VPC · two Availability Zones]
-    direction TB
     Public[Public subnets] --> Bastion[Bastion host]
     Public --> NAT[NAT Gateways during testing]
     Bastion --> Private[Private application subnets]
@@ -26,13 +18,19 @@ flowchart TB
   NAT --> IGW
 ```
 
-Private application instances have no public IP addresses. Administrative SSH access passes through the bastion host, while NAT Gateways provided temporary outbound connectivity during testing.
+### What I implemented
 
-## Documentation
+- Designed a VPC across two Availability Zones with separate public and private subnet tiers.
+- Kept application instances private and used a bastion host for controlled SSH administration.
+- Configured route tables, an Internet Gateway, Security Groups, and temporary NAT egress.
+- Validated private egress, routing, and east-west connectivity from Linux hosts.
+- Enabled CloudTrail and VPC Flow Logs to support auditing and network investigation.
+- Deleted temporary NAT Gateways and stopped test instances to control costs.
 
-- [VPC networking module](02-networking/01-vpc/README.md) — design, access controls, tests, and lessons learned.
-- [Evidence guide](docs/evidence.md) — how to add screenshots safely.
-- [Portfolio hygiene guide](docs/portfolio-hygiene.md) — what must never be committed.
+### Explore the project
+
+- [Networking module](02-networking/README.md)
+- [VPC design and validation](02-networking/01-vpc/README.md)
 
 ## Repository layout
 
@@ -40,35 +38,20 @@ Private application instances have no public IP addresses. Administrative SSH ac
 .
 ├── README.md
 ├── 02-networking/
-│   └── 01-vpc/                 # Completed VPC implementation
-│       └── README.md
-├── docs/                       # Supporting portfolio documentation
-│   ├── evidence.md
-│   └── portfolio-hygiene.md
+│   ├── README.md
+│   └── 01-vpc/
+│       ├── README.md
+│       └── screenshots/
 └── .gitignore
 ```
-
-## Validation performed
-
-- Verified private-instance outbound HTTPS through NAT during the active test window.
-- Confirmed private-to-private connectivity after correcting the applicable network controls.
-- Verified routing from each instance with `ip route`.
-- Enabled CloudTrail and VPC Flow Logs to support audit and network investigation.
-
-## Security and cost notes
-
-- No private application instance was directly reachable from the public internet.
-- Security Groups were used as stateful access controls; application SSH was restricted to the bastion path.
-- NAT Gateways were deleted after validation to avoid ongoing charges.
-- This repository intentionally omits live account IDs, resource IDs, public IPs, exported logs, credentials, and private keys.
-
-## Status
-
-**In progress.** The VPC, subnets, routing, bastion access, EC2 validation, CloudTrail, and Flow Logs are complete. Planned work includes a practical IAM-role exercise, Terraform implementation, monitoring, and security-service extensions.
 
 ## Skills demonstrated
 
 AWS VPC · EC2 · subnetting · CIDR · routing · NAT · Internet Gateway · Security Groups · SSH · IAM · CloudTrail · VPC Flow Logs · Linux troubleshooting · cloud cost awareness
+
+## Current status
+
+The VPC networking lab is complete. Next steps are a practical IAM-role exercise, Terraform implementation, monitoring, and additional AWS security services.
 
 ## Author
 
